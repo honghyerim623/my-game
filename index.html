@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>🚓 경찰과 도둑 게임</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #0a0a0a, #444);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+    }
+    h1 {
+      padding-top: 20px;
+    }
+    #gameCanvas {
+      display: block;
+      margin: 20px auto;
+      background: #111;
+      border: 4px solid #777;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+    #score {
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚓 경찰과 도둑 게임</h1>
+  <p>← → 방향키로 경찰을 움직여 도둑을 잡으세요!</p>
+  <div id="score">점수: 0</div>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const cop = { x: 180, y: 340, width: 40, height: 50, color: "#3498db" };
+    const thief = { x: Math.random() * 360, y: 0, width: 40, height: 50, color: "#e74c3c", speed: 2 };
+
+    let score = 0;
+    let gameOver = false;
+
+    function drawCharacter(obj) {
+      ctx.fillStyle = obj.color;
+      ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+      ctx.fillStyle = "white";
+      ctx.font = "bold 16px sans-serif";
+      ctx.fillText(obj === cop ? "👮" : "🕵️", obj.x + 6, obj.y + 30);
+    }
+
+    function draw() {
+      if (gameOver) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawCharacter(cop);
+      drawCharacter(thief);
+
+      thief.y += thief.speed;
+
+      if (
+        cop.x < thief.x + thief.width &&
+        cop.x + cop.width > thief.x &&
+        cop.y < thief.y + thief.height &&
+        cop.y + cop.height > thief.y
+      ) {
+        score++;
+        document.getElementById("score").innerText = "점수: " + score;
+        thief.x = Math.random() * 360;
+        thief.y = 0;
+        thief.speed += 0.3;
+      }
+
+      if (thief.y > canvas.height) {
+        alert("💥 게임 오버! 점수: " + score);
+        gameOver = true;
+      }
+
+      if (!gameOver) requestAnimationFrame(draw);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" && cop.x > 0) {
+        cop.x -= 20;
+      } else if (e.key === "ArrowRight" && cop.x < canvas.width - cop.width) {
+        cop.x += 20;
+      }
+    });
+
+    draw();
+  </script>
+</body>
+</html>
